@@ -1,26 +1,26 @@
 {
-    "name": "quicktype-graphql-input",
-    "version": "18.0.15",
-    "package": "Package for using GraphQL as an input language to quicktype",
-    "license": "Apache-2.0",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "repository": "https://github.com/quicktype/quicktype",
-    "scripts": {
-        "clean": "rm -rf dist node_modules *~",
-        "build": "tsc"
-    },
-    "dependencies": {
-        "quicktype-core": "file:../quicktype-core",
-        "collection-utils": "^1.0.1",
-        "graphql": "^0.11.7"
-    },
-    "devDependencies": {
-        "@types/node": "18.19.31",
-        "@types/graphql": "^0.11.7",
-        "typescript": "4.9.5"
-    },
-    "files": [
-        "dist"
-    ]
+  "name": "@novonotes/quicktype-graphql-input",
+  "version": "23.0.6",
+  "package": "Package for using GraphQL as an input language to quicktype",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": "https://github.com/quicktype/quicktype",
+  "scripts": {
+    "clean": "rm -rf dist node_modules *~",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@novonotes/quicktype-core": "23.0.6",
+    "collection-utils": "^1.0.1",
+    "graphql": "^0.11.7"
+  },
+  "devDependencies": {
+    "@types/node": "18.19.31",
+    "@types/graphql": "^0.11.7",
+    "typescript": "4.9.5"
+  },
+  "files": [
+    "dist"
+  ]
 }

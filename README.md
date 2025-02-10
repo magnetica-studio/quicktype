@@ -3,6 +3,8 @@
 [![npm version](https://badge.fury.io/js/quicktype.svg)](https://badge.fury.io/js/quicktype)
 ![Build status](https://github.com/quicktype/quicktype/actions/workflows/master.yaml/badge.svg)
 
+**This is a fork of the original `quicktype` repository for the purpose of using it in NovoNotes projects.**
+
 `quicktype` generates strongly-typed models and serializers from JSON, JSON Schema, TypeScript, and [GraphQL queries](https://blog.quicktype.io/graphql-with-quicktype/), making it a breeze to work with JSON type-safely in many programming languages.
 
 -   [Try `quicktype` in your browser](https://app.quicktype.io).
@@ -194,7 +196,8 @@ The argument to `quicktype` is a complex object with many optional properties. [
 
 `quicktype` is implemented in TypeScript and requires `nodejs` and `npm` to build and run.
 
-First, install `typescript` globally via `npm`:
+~~First, install `typescript` globally via `npm`:~~
+(Satoshi) I don't think this is needed.
 
 Clone this repo and do:
 
@@ -243,10 +246,10 @@ files, URLs, or add other options.
 
 ```bash
 # Run full test suite
-# メモ: これはうまく動かない感じする。
+# (Satoshi) This doesn't work in my environment.
 npm run test
 
-# こっちは動いてそう。
+# (Satoshi) This works.
 FIXTURE=dart npm test
 
 # Test a specific language (see test/languages.ts)
@@ -257,15 +260,8 @@ FIXTURE=swift npm test -- pokedex.json
 FIXTURE=swift npm test -- test/inputs/json/samples
 ```
 
-# メモ
-
-NovoNotes ではとりあえず以下の運用。
+### Publish
 
 ```bash
-npm run build
-npm link
-```
-
-```bash
-npm unlink -g quicktype
+npm run pub
 ```

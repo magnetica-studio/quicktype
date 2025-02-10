@@ -14,11 +14,20 @@ function exec(command: string) {
 
 const PUBLISHED = (() => {
     // Get the highest published version of any tag
-    const all = JSON.parse(exec(`npm show quicktype versions --json`));
+    const all = JSON.parse(exec(`npm show @novonotes/quicktype versions --json`));
+    if (typeof all === "string") {
+        return all;
+    }
     return all[all.length - 1];
 })();
 
-const CURRENT = exec(`npm version`).match(/quicktype: '(.+)'/)![1];
+if (PUBLISHED === undefined) {
+    console.log("No version published yet.");
+    process.exit(0);
+}
+
+const CURRENT = exec(`npm version`).match(/'@novonotes\/quicktype': '(.+)'/)![1];
+console.log(CURRENT, PUBLISHED);
 switch (semver.compare(CURRENT, PUBLISHED)) {
     case -1:
         console.error(`* package.json version is ${CURRENT} but ${PUBLISHED} is published. Patching...`);
