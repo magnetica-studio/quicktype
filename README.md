@@ -243,7 +243,11 @@ files, URLs, or add other options.
 
 ```bash
 # Run full test suite
+# メモ: これはうまく動かない感じする。
 npm run test
+
+# こっちは動いてそう。
+FIXTURE=dart npm test
 
 # Test a specific language (see test/languages.ts)
 FIXTURE=golang npm test
@@ -251,4 +255,17 @@ FIXTURE=golang npm test
 # Test a single sample or directory
 FIXTURE=swift npm test -- pokedex.json
 FIXTURE=swift npm test -- test/inputs/json/samples
+```
+
+# メモ
+
+NovoNotes ではとりあえず以下の運用。
+
+```bash
+npm run build
+npm link
+```
+
+```bash
+npm unlink -g quicktype
 ```

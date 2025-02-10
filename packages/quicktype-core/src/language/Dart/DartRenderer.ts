@@ -236,29 +236,50 @@ export class DartRenderer extends ConvenienceRenderer {
         return ["List<", itemType, ">.from(", list, ".map((x) => ", mapper, "))"];
     }
 
-    protected mapMap(isNullable: boolean, valueType: Sourcelike, map: Sourcelike, valueMapper: Sourcelike): Sourcelike {
+    protected mapMapFrom(
+        isNullable: boolean,
+        valueType: Sourcelike,
+        map: Sourcelike,
+        valueMapper: Sourcelike
+    ): Sourcelike {
+        // デコード側: JSONからMapを変換する際に null チェックを行う
         if (this._options.nullSafety && isNullable && !this._options.requiredProperties) {
-            return ["Map.from(", map, "!).map((k, v) => MapEntry<String, ", valueType, ">(k, ", valueMapper, "))"];
+            return [
+                map,
+                " == null ? null : Map.from(",
+                map,
+                ").map((k, v) => MapEntry<String, ",
+                valueType,
+                ">(k, ",
+                valueMapper,
+                "))"
+            ];
         }
 
         return ["Map.from(", map, ").map((k, v) => MapEntry<String, ", valueType, ">(k, ", valueMapper, "))"];
     }
 
-    protected mapClass(isNullable: boolean, classType: ClassType, dynamic: Sourcelike): Sourcelike {
+    protected mapMapTo(
+        isNullable: boolean,
+        valueType: Sourcelike,
+        map: Sourcelike,
+        valueMapper: Sourcelike
+    ): Sourcelike {
+        // エンコード側: オブジェクトからMapを変換する際に null チェックし、! を付与する
         if (this._options.nullSafety && isNullable && !this._options.requiredProperties) {
             return [
-                dynamic,
-                " == null ? null : ",
-                this.nameForNamedType(classType),
-                ".",
-                this.fromJson,
-                "(",
-                dynamic,
-                ")"
+                map,
+                " == null ? null : Map.from(",
+                map,
+                "!).map((k, v) => MapEntry<String, ",
+                valueType,
+                ">(k, ",
+                valueMapper,
+                "))"
             ];
         }
 
-        return [this.nameForNamedType(classType), ".", this.fromJson, "(", dynamic, ")"];
+        return ["Map.from(", map, ").map((k, v) => MapEntry<String, ", valueType, ">(k, ", valueMapper, "))"];
     }
 
     // FIXME: refactor this
@@ -278,15 +299,15 @@ export class DartRenderer extends ConvenienceRenderer {
             arrayType =>
                 this.mapList(
                     isNullable || arrayType.isNullable,
-                    this.dartType(arrayType.items),
+                    this.dartType(arrayType.items, true),
                     dynamic,
                     this.fromDynamicExpression(arrayType.items.isNullable, arrayType.items, "x")
                 ),
             classType => this.mapClass(isNullable || classType.isNullable, classType, dynamic),
             mapType =>
-                this.mapMap(
+                this.mapMapFrom(
                     mapType.isNullable || isNullable,
-                    this.dartType(mapType.values),
+                    this.dartType(mapType.values, true),
                     dynamic,
                     this.fromDynamicExpression(mapType.values.isNullable, mapType.values, "v")
                 ),
@@ -359,7 +380,7 @@ export class DartRenderer extends ConvenienceRenderer {
                 return [dynamic, ".", this.toJson, "()"];
             },
             mapType =>
-                this.mapMap(
+                this.mapMapTo(
                     mapType.isNullable || isNullable,
                     "dynamic",
                     dynamic,
@@ -582,16 +603,9 @@ export class DartRenderer extends ConvenienceRenderer {
                 );
 
                 this.ensureBlankLine();
-                this.emitLine(
-                    // Map<String, dynamic> toJson() => _$PublicAnswerToJson(this);
-                    "Map<String, dynamic> toJson() => ",
-                    "_$",
-                    className,
-                    "ToJson(this);"
-                );
+                this.emitLine("Map<String, dynamic> toJson() => ", "_$", className, "ToJson(this);");
             } else {
                 if (this._options.justTypes) return;
-
                 if (this._options.codersInClass) {
                     this._emitStringJsonEncoderDecoder(className);
                 }
@@ -679,16 +693,16 @@ export class DartRenderer extends ConvenienceRenderer {
     protected emitEnumValues(): void {
         this.ensureBlankLine();
         this.emitMultiline(`class EnumValues<T> {
-	Map<String, T> map;
-	late Map<T, String> reverseMap;
-
-	EnumValues(this.map);
-
-	Map<T, String> get reverse {
-			reverseMap = map.map((k, v) => MapEntry(v, k));
-			return reverseMap;
-	}
-}`);
+      Map<String, T> map;
+      late Map<T, String> reverseMap;
+  
+      EnumValues(this.map);
+  
+      Map<T, String> get reverse {
+              reverseMap = map.map((k, v) => MapEntry(v, k));
+              return reverseMap;
+      }
+  }`);
     }
 
     private _emitTopLvlEncoderDecoder(): void {
@@ -742,5 +756,14 @@ export class DartRenderer extends ConvenienceRenderer {
         if (this._needEnumValues) {
             this.emitEnumValues();
         }
+    }
+
+    protected mapClass(isNullable: boolean, classType: ClassType, json: Sourcelike): Sourcelike {
+        const className = this.nameForNamedType(classType);
+        if (this._options.nullSafety && isNullable && !this._options.requiredProperties) {
+            return [json, " == null ? null : ", className, ".", this.fromJson, "(", json, ")"];
+        }
+
+        return [className, ".", this.fromJson, "(", json, ")"];
     }
 }

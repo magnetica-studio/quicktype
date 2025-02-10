@@ -203,9 +203,8 @@ export abstract class Renderer {
         for (let i = 1; i < numLines; i++) {
             const line = lines[i];
             const { indent, text } = lineIndentation(line);
-            assert(indent % 4 === 0, "Indentation is not a multiple of 4.");
+            const newIndent = Math.floor(indent / 4);
             if (text !== null) {
-                const newIndent = indent / 4;
                 this.changeIndent(newIndent - currentIndent);
                 currentIndent = newIndent;
                 this.emitLine(text);
